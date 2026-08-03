@@ -53,8 +53,9 @@ public final class ASM {
     
     /**
      * The detected ASM API Version
+     * Note: package features are broken on some platform (e.g. ART)
      */
-    public static final int API_VERSION = ASM.detectVersion();
+    public static int API_VERSION = ASM.detectVersion();
 
     private ASM() {
     }
