@@ -1,7 +1,7 @@
 
 ### [![Build Status](http://ci.liteloader.com/view/Other/job/Mixin/badge/icon)](http://ci.liteloader.com/view/Other/job/Mixin/lastSuccessfulBuild/)
 
-![Mixin Logo](docs/javadoc/resources/logo.png?raw=true)
+![Mixin Logo](res/logo.png?raw=true)
 
 **Mixin** is a trait/mixin framework for Java using [ASM](https://asm.ow2.io/)
 and hooking into the runtime classloading process via a set of pluggable
