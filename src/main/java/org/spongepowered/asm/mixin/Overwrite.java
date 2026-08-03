@@ -91,6 +91,6 @@ public @interface Overwrite {
      * @return True to instruct the annotation processor to search for
      *      obfuscation mappings for this method 
      */
-    public boolean remap() default true;
+    public boolean remap() default false;
 
 }

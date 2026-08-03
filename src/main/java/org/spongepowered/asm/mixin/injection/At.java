@@ -207,7 +207,7 @@ public @interface At {
      * @return True to instruct the annotation processor to search for
      *      obfuscation mappings for this annotation 
      */
-    public boolean remap() default true;
+    public boolean remap() default false;
 
     /**
      * In general, injecting into constructors should be treated with care,

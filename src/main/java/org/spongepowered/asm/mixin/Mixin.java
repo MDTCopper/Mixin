@@ -112,8 +112,8 @@ public @interface Mixin {
      * explicitly decorated with <tt>remap = true</tt>.
      * 
      * @return True to instruct the annotation processor to search for
-     *      obfuscation mappings for this annotation (default true). 
+     *      obfuscation mappings for this annotation (default false).
      */
-    public boolean remap() default true;
+    public boolean remap() default false;
 
 }

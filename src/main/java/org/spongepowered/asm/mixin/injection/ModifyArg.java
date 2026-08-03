@@ -152,7 +152,7 @@ public @interface ModifyArg {
      * @return True to instruct the annotation processor to search for
      *      obfuscation mappings for this annotation 
      */
-    public boolean remap() default true;
+    public boolean remap() default false;
     
     /**
      * In general, injectors are intended to "fail soft" in that a failure to
