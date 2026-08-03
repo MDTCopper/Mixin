@@ -25,7 +25,7 @@ apply plugin: 'potemkin-modules'
 defaultTasks 'licenseFormat', 'check', 'build'
 
 // Basic project information
-group = 'org.spongepowered'
+group = 'com.github.MDTCopper'
 archivesBaseName = 'mixin'
 version = buildVersion + (buildType == 'RELEASE' ? '' : "-$buildType")
 
@@ -39,112 +39,35 @@ ext.buildNumber = project.hasProperty("buildNumber") ? buildNumber : '0'
 ext.ciSystem = project.hasProperty("ciSystem") ? ciSystem : 'unknown'
 ext.commit = project.hasProperty("commit") ? commit : 'unknown'
 ext.asmVersion = project.hasProperty("asmVersion") ? asmVersion : '6.2'
-ext.legacyForgeAsmVersion = project.hasProperty("legacyForgeAsmVersion") ? asmVersion : '5.0.3'
-
-// True to do jar signing task
-ext.doSignJar = project.hasProperty("keyStorePath")
 
 java {
-    modularity.inferModulePath = false
     toolchain.languageVersion = JavaLanguageVersion.of(ciSystem == 'unknown' ? 16 : 8)
 }
 
 // Project repositories
 repositories {
+    mavenLocal()
     mavenCentral()
-    maven {
-        name = 'minecraft'
-        url = 'https://libraries.minecraft.net/'
-    }
-    maven {
-        // For fernflower
-        name = 'sponge'
-        url = 'https://repo.spongepowered.org/maven'
-    }
-    maven {
-        // For modlauncher
-        name = 'neoforged'
-        url = 'https://maven.neoforged.net/releases'
-    }
 }
 
 configurations {
     stagingJar
-    
-    exampleImplementation       .extendsFrom implementation
-    fernflowerImplementation    .extendsFrom implementation
-    launchwrapperImplementation .extendsFrom implementation
-    agentImplementation         .extendsFrom implementation
-    modlauncherImplementation   .extendsFrom implementation
-    modlauncher9Implementation  .extendsFrom modlauncherImplementation
-    modularityImplementation    .extendsFrom modlauncher9Implementation
-    modularityCompileOnly       .extendsFrom compileOnly
 }
 
 sourceSets {
     legacy {
         ext.languageVersion = 8
-        ext.compatibility = '1.6'
+        ext.compatibility = '1.8'
     }
     main {
         compileClasspath += legacy.output
         ext.languageVersion = 8
-        ext.compatibility = '1.6'
+        ext.compatibility = '1.8'
     }
     ap {
         compileClasspath += main.output
         ext.languageVersion = 8
         ext.compatibility = '1.8'
-    }
-    fernflower {
-        compileClasspath += main.output
-        ext.languageVersion = 8
-        ext.compatibility = '1.6'
-        ext.modularityExcluded = true
-    }
-    agent {
-        compileClasspath += main.output
-        ext.languageVersion = 8
-        ext.compatibility = '1.6'
-    }
-    bridge {
-        compileClasspath += main.output
-        ext.languageVersion = 8
-        ext.compatibility = '1.8'
-        ext.modularityExcluded = true
-    }
-    example {
-        compileClasspath += main.output
-        compileClasspath += ap.output
-        ext.modularityExcluded = true
-    }
-    test {
-        ext.modularityExcluded = true
-    }
-    launchwrapper {
-        compileClasspath += main.output
-        ext.languageVersion = 8
-        ext.compatibility = '1.8'
-    }
-    modlauncher {
-        compileClasspath += main.output
-        ext.languageVersion = 8
-        ext.compatibility = '1.8'
-    }
-    modlauncher4 {
-        compileClasspath += main.output
-        compileClasspath += modlauncher.output
-        ext.languageVersion = 8
-        ext.compatibility = '1.8'
-    }
-    modlauncher9 {
-        ext.languageVersion = 16
-        compileClasspath += main.output
-        compileClasspath += modlauncher.output
-    }
-    modularity {
-        ext.languageVersion = 16
-        ext.modularityExcluded = true // don't add ourselves
     }
 }
 
@@ -174,67 +97,8 @@ dependencies {
     apImplementation "org.ow2.asm:asm-tree:$asmVersion"
     apImplementation guava
     
-    // Fernflower decompiler
-    fernflowerImplementation 'org.jetbrains.java.decompiler:fernflower:sponge-SNAPSHOT'
-
-    // LegacyLauncher service
-    launchwrapperImplementation ('net.minecraft:launchwrapper:1.11') {
-        exclude module: 'lwjgl'
-        exclude module: 'asm-debug-all'
-        exclude module: 'jopt-simple'
-    }
-    
-    modlauncherImplementation 'net.sf.jopt-simple:jopt-simple:5.0.4'
-    modlauncherCompileOnly 'org.apache.logging.log4j:log4j-core:2.0-beta9'
-    modlauncherImplementation ("cpw.mods:modlauncher:$legacyModlauncherVersion") {
-        exclude module: 'asm'
-        exclude module: 'asm-analysis'
-        exclude module: 'asm-commons'
-        exclude module: 'asm-tree'
-        exclude module: 'jopt-simple'
-    }
-    
-    modlauncher4Implementation ("cpw.mods:modlauncher:$legacyModlauncherVersion") {
-        exclude module: 'asm'
-        exclude module: 'asm-analysis'
-        exclude module: 'asm-commons'
-        exclude module: 'asm-tree'
-        exclude module: 'jopt-simple'
-    }
-    
-    modlauncher9Implementation ("cpw.mods:modlauncher:$modlauncherVersion") {
-        exclude module: 'jopt-simple'
-    }
-    modlauncher9Implementation 'cpw.mods:securejarhandler:2.1.24'
-    
     // asm bridge
-    bridgeImplementation 'org.apache.logging.log4j:log4j-core:2.0-beta9'
-    bridgeImplementation "org.ow2.asm:asm-commons:$legacyForgeAsmVersion"
-    
     legacyImplementation "org.ow2.asm:asm-tree:$asmVersion"
-    
-    modularityCompileOnly 'org.apache.logging.log4j:log4j-core:2.11.2'
-}
-
-javadoc {
-    exclude '**/throwables'
-    classpath += sourceSets.legacy.output
-    source sourceSets.ap.allJava
-    exclude {
-        it.relativePath.file && it.relativePath.pathString =~ 'tools' && !(it.name =~ /SuppressedBy|package-info/)
-    }
-    options {
-        docTitle 'Welcome to the Mixin Javadoc'
-        overview 'docs/javadoc/overview.html'
-        stylesheetFile file('docs/javadoc/mixin.css')
-        addBooleanOption '-allow-script-in-comments', true
-    }
-    doLast {
-        copy {
-            from 'docs/javadoc/resources'
-            into outputDirectory
-        }
-    }
 }
 
 eclipse {
@@ -263,9 +127,6 @@ eclipse {
             }
         }
     }
-    
-    // Build service task outputs for test projects
-    autoBuildTasks compileModlauncher4Java, compileModlauncher9Java, compileLaunchwrapperJava
 }
 
 // Filter, process, and include resources
@@ -309,8 +170,6 @@ tasks.withType(JavaCompile) {
     options.encoding = 'utf8'
 }
 
-def modularityInputs = objects.fileCollection()
-
 project.sourceSets.each { set -> {
     if (set.ext.has("languageVersion")) {
         project.tasks[set.compileJavaTaskName].javaCompiler = javaToolchains.compilerFor {
@@ -321,31 +180,7 @@ project.sourceSets.each { set -> {
         project.tasks[set.compileJavaTaskName].sourceCompatibility = set.ext.compatibility
         project.tasks[set.compileJavaTaskName].targetCompatibility = set.ext.compatibility
     }
-    def modularityExcluded = set.ext.has("modularityExcluded") && set.ext.modularityExcluded
-    if (!modularityExcluded) {
-        project.sourceSets.modularity {
-            compileClasspath += set.output
-        }
-        modularityInputs.from set.output
-    }
 }}
-
-compileModularityJava {
-    inputs.files(modularityInputs)
-    doFirst {
-        options.compilerArgs = [
-            '--module-path', classpath.asPath,
-            '--patch-module', "org.spongepowered.mixin=${modularityInputs.collect { it.absolutePath }.join(File.pathSeparator)}"
-        ]
-    }
-}
-
-if (JavaVersion.current().isJava8Compatible()) {
-    tasks.withType(Javadoc) {
-        // disable the crazy super-strict doclint tool in Java 8
-        options.addStringOption('Xdoclint:syntax', '-quiet')
-    }
-}
 
 task stagingJar(type: ShadowJar) {
     sourceSets.findAll { !(it.name =~ /example|test/) }.each {
@@ -355,21 +190,11 @@ task stagingJar(type: ShadowJar) {
     
     // JAR manifest configuration
     manifest.attributes(
-        "Built-By": System.properties['user.name'],
         "Created-By": System.properties['java.vm.version'] + " (" + System.properties['java.vm.vendor'] + ")",
         "Implementation-Title": name,
-        "Implementation-Version": project.version + "+" + ciSystem + "-b" + buildNumber + ".git-" + commit,
-        "Implementation-Vendor": url,
-        // for hotswap agent
-        "Premain-Class": "org.spongepowered.tools.agent.MixinAgent",
-        "Agent-Class": "org.spongepowered.tools.agent.MixinAgent",
-        "Can-Redefine-Classes": true,
-        "Can-Retransform-Classes": true
+        "Implementation-Version": project.version,
+        "Implementation-Vendor": url
     )
-
-    if (project.doSignJar) {
-        classifier = 'unsigned'
-    }
     
     mergeServiceFiles()
 }
@@ -384,42 +209,6 @@ shadowJar  {
 }
 build.dependsOn(shadowJar)
 
-if (project.doSignJar) {
-    // Define signjar task    
-    task signJar() {
-        inputs.files(stagingJar.outputs)
-        outputs.files stagingJar.outputs.files.collect {
-            new File(it.parent, it.name.replace('-unsigned', ''))
-        }
-        doLast {
-            stagingJar.outputs.files.each {
-                ant.signjar(
-                    alias: project.keyStoreCert,
-                    jar: it,
-                    signedJar: new File(it.parent, it.name.replace('-unsigned', '')),
-                    keystore: project.keyStorePath,
-                    storepass: project.keyStoreSecret,
-                    keypass: project.keyStoreSecret,
-                    tsaurl: project.timestampAuthority,
-                    preservelastmodified: 'true',
-                    verbose: true,
-                    storetype: project.keyStoreType,
-                    providerclass: project.antSignProviderClass,
-                    providerarg: project.antSignProviderArg
-                )
-            }
-        }
-    }
-    build.dependsOn(signJar)
-}
-
-// Run this task instead of build to generate a timestamped shadow jar (for dev)
-task timestamp(type: Jar, dependsOn: build) {
-    if (gradle.startParameter.taskNames.contains(name)) {
-        shadowJar.classifier = new Date().format('yyyyMMddHHmmss')
-    }
-}
-
 task sourceJar(type: Jar) {
     sourceSets.findAll { it.name != 'modularity' }.each {
         from it.java
@@ -429,37 +218,27 @@ task sourceJar(type: Jar) {
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
-task javadocJar(type: Jar, dependsOn: javadoc) {
-	from javadoc.destinationDir
-	classifier = "javadoc"
-}
-
 artifacts {
-    if (project.doSignJar) {
-        archives signJar.outputs.files[0]
-    } else {
-        archives stagingJar
-    }
+    archives stagingJar
     archives sourceJar
-    archives javadocJar
     archives shadowJar
 }
 
 ext.mavenPom = {
-    name = project.archivesBaseName
+    name = "Copper Mixin"
     packaging = project.packaging
-    description = project.projectName
-    url = 'http://www.spongepowered.org/'
+    description = "Mixin is a trait/mixin and bytecode weaving framework for Java using ASM"
+    url = 'https://github.com/MDTCopper/Mixin'
 
     scm {
-        url = 'https://github.com/SpongePowered/Mixin'
-        connection = 'scm:git:git://github.com/SpongePowered/Mixin.git'
-        developerConnection = 'scm:git:git@github.com:SpongePowered/Mixin.git'
+        url = 'https://github.com/MDTCopper/Mixin'
+        connection = 'scm:git:git://github.com/MDTCopper/Mixin.git'
+        developerConnection = 'scm:git:git@github.com:MDTCopper/Mixin.git'
     }
 
     issueManagement {
         system = 'GitHub Issues'
-        url = 'https://github.com/SpongePowered/Mixin/issues'
+        url = 'https://github.com/MDTCopper/Mixin/issues'
     }
 
     licenses {
@@ -479,45 +258,9 @@ publishing {
             version = project.version
             artifactId = project.archivesBaseName
 
-            if (project.doSignJar) {
-                artifact signJar.outputs.files[0]
-            } else {
-                artifact stagingJar
-            }
+            artifact stagingJar
             artifact sourceJar
-            artifact javadocJar
             artifact shadowJar
-        }
-    }
-    
-    repositories {
-        if (buildType == 'RELEASE') {
-            if (project.hasProperty("releaseRepo")) {
-                maven {
-                    credentials {
-                        username = project.releaseRepoUsername
-                        password = project.releaseRepoPassword
-                    }
-                    url project.releaseRepo
-                }
-            }
-            if (project.hasProperty("spongeReleaseRepo")) {
-                maven {
-                    credentials {
-                        username = project.spongeUsername
-                        password = project.spongePassword
-                    }
-                    url project.spongeReleaseRepo
-                }
-            }
-        } else if (project.hasProperty("spongeSnapshotRepo")) {
-            maven {
-                credentials {
-                    username = project.spongeUsername
-                    password = project.spongePassword
-                }
-                url project.spongeSnapshotRepo
-            }
         }
     }
 }
