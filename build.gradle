@@ -26,8 +26,8 @@ defaultTasks 'licenseFormat', 'check', 'build'
 
 // Basic project information
 group = 'com.github.MDTCopper'
-archivesBaseName = 'mixin'
-version = buildVersion + (buildType == 'RELEASE' ? '' : "-$buildType")
+archivesBaseName = 'Mixin'
+version = buildVersion
 
 // Extended project information
 ext.projectName = 'Mixin'
@@ -183,7 +183,7 @@ project.sourceSets.each { set -> {
 }}
 
 task stagingJar(type: ShadowJar) {
-    sourceSets.findAll { !(it.name =~ /example|test/) }.each {
+    sourceSets.findAll { !(it.name =~ /ap/) }.each {
         from it.output
     }
     configurations = [project.configurations.stagingJar]
@@ -193,7 +193,8 @@ task stagingJar(type: ShadowJar) {
         "Created-By": System.properties['java.vm.version'] + " (" + System.properties['java.vm.vendor'] + ")",
         "Implementation-Title": name,
         "Implementation-Version": project.version,
-        "Implementation-Vendor": url
+        "Implementation-Vendor": url,
+        "Upstream-Mixin-Version": upstreamMixinVersion
     )
     
     mergeServiceFiles()
