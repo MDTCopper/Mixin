@@ -50,8 +50,9 @@ public abstract class Constants {
     
     public static final String SYNTHETIC_PACKAGE = "org.spongepowered.asm.synthetic";
     public static final char UNICODE_SNOWMAN = '\u2603';
-    
-    public static final File DEBUG_OUTPUT_DIR = new File(Constants.DEBUG_OUTPUT_PATH);
+
+    // remove final: different folder for different instance
+    public static File DEBUG_OUTPUT_DIR = new File(Constants.DEBUG_OUTPUT_PATH);
     
     public static final String SIDE_DEDICATEDSERVER = "DEDICATEDSERVER";
     public static final String SIDE_SERVER = "SERVER";
