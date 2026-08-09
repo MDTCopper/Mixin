@@ -238,7 +238,7 @@ final class MixinConfig implements Comparable<MixinConfig>, IMixinConfig {
      * Target selector, eg. &#064;env(DEFAULT)
      */
     @SerializedName("target")
-    private String selector;
+    private String selector = "@env(DEFAULT)";
 
     /**
      * Minimum version of the mixin subsystem required to correctly apply mixins
