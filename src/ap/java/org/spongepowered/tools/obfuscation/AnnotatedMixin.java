@@ -182,7 +182,7 @@ class AnnotatedMixin implements IMixinContext, IAnnotatedElement {
         this.annotation = this.handle.getAnnotation(Mixin.class);
         this.classRef = TypeUtils.getInternalName(type);
         this.primaryTarget = this.initTargets(ap);
-        this.remap = this.annotation.getBoolean("remap", true) && this.targets.size() > 0;
+        this.remap = this.annotation.getBoolean("remap", false) && this.targets.size() > 0;
 
         this.overwrites = new AnnotatedMixinElementHandlerOverwrite(ap, this);
         this.shadows = new AnnotatedMixinElementHandlerShadow(ap, this);
