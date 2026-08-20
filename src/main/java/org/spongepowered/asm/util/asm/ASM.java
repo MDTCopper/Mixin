@@ -190,7 +190,7 @@ public final class ASM {
                             }
                         }
                     }
-                } else if (name.matches("V([0-9_]+)")) {
+                } else if (name.matches("V([0-9_]+)") && !name.equals("V_PREVIEW")) {
                     int minor = (version >> 16) & 0xFFFF;
                     int major = (version) & 0xFFFF;
                     if (major > ASM.maxClassMajorVersion || (major == ASM.maxClassMajorVersion && minor > ASM.maxClassMinorVersion)) {
@@ -199,8 +199,6 @@ public final class ASM {
                         ASM.maxClassVersion = version;
                         ASM.maxJavaVersion = name.replace('_', '.').substring(1);
                     }
-                } else if ("ACC_PUBLIC".equals(name)) {
-                    break;
                 }
             } catch (ReflectiveOperationException ex) {
                 throw new Error(ex);
