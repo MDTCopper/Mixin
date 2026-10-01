@@ -52,6 +52,8 @@ repositories {
 
 configurations {
     stagingJar
+
+    agentImplementation         .extendsFrom implementation
 }
 
 sourceSets {
@@ -68,6 +70,11 @@ sourceSets {
         compileClasspath += main.output
         ext.languageVersion = 8
         ext.compatibility = '1.8'
+    }
+    agent {
+        compileClasspath += main.output
+        ext.languageVersion = 8
+        ext.compatibility = '1.6'
     }
 }
 
@@ -194,7 +201,12 @@ task stagingJar(type: ShadowJar) {
         "Implementation-Title": name,
         "Implementation-Version": project.version,
         "Implementation-Vendor": url,
-        "Upstream-Mixin-Version": upstreamMixinVersion
+        "Upstream-Mixin-Version": upstreamMixinVersion,
+        // for hotswap agent
+        "Premain-Class": "org.spongepowered.tools.agent.MixinAgent",
+        "Agent-Class": "org.spongepowered.tools.agent.MixinAgent",
+        "Can-Redefine-Classes": true,
+        "Can-Retransform-Classes": true
     )
     
     mergeServiceFiles()
