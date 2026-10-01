@@ -201,6 +201,14 @@ public class MixinAgent implements IHotSwap {
         }
     }
 
+    public static ClassLoader getClassLoader() {
+        return classLoader;
+    }
+
+    public static byte[] getStubClassBytecode(Class<?> clazz) {
+        return classLoader.getFakeMixinBytecode(clazz);
+    }
+
     /**
      * Initialize the java agent
      *
