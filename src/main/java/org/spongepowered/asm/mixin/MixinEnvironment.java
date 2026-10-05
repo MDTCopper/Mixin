@@ -904,6 +904,34 @@ public final class MixinEnvironment implements ITokenProvider {
             }
 
         },
+
+        /**
+         * Java 26 or above is required
+         */
+        JAVA_26(26, Opcodes.V26, LanguageFeatures.METHODS_IN_INTERFACES | LanguageFeatures.PRIVATE_SYNTHETIC_METHODS_IN_INTERFACES
+                | LanguageFeatures.PRIVATE_METHODS_IN_INTERFACES | LanguageFeatures.NESTING | LanguageFeatures.DYNAMIC_CONSTANTS
+                | LanguageFeatures.RECORDS | LanguageFeatures.SEALED_CLASSES) {
+
+            @Override
+            boolean isSupported() {
+                return JavaVersion.current() >= JavaVersion.JAVA_26 && ASM.isAtLeastVersion(9, 9);
+            }
+
+        },
+
+        /**
+         * Java 27 or above is required
+         */
+        JAVA_27(27, Opcodes.V27, LanguageFeatures.METHODS_IN_INTERFACES | LanguageFeatures.PRIVATE_SYNTHETIC_METHODS_IN_INTERFACES
+                | LanguageFeatures.PRIVATE_METHODS_IN_INTERFACES | LanguageFeatures.NESTING | LanguageFeatures.DYNAMIC_CONSTANTS
+                | LanguageFeatures.RECORDS | LanguageFeatures.SEALED_CLASSES) {
+
+            @Override
+            boolean isSupported() {
+                return JavaVersion.current() >= JavaVersion.JAVA_27 && ASM.isAtLeastVersion(9, 10);
+            }
+
+        },
         ;
         
         /**

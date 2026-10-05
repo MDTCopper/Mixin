@@ -93,7 +93,7 @@ dependencies {
     
     implementation guava
     implementation 'com.google.code.gson:gson:2.2.4'
-    if (Float.parseFloat(asmVersion) < 6) {
+    if (Float.parseFloat(asmVersion.split("\\.")[0]) < 6) {
         implementation "org.ow2.asm:asm-debug-all:$asmVersion"
     }
     implementation "org.ow2.asm:asm-tree:$asmVersion"
